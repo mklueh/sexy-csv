@@ -29,27 +29,7 @@ public class SexyCSV {
 
     private Predicate<? super String> rowFilter;
 
-    @Data
-    @AllArgsConstructor
-    public static class Row {
-        private int line;
-        private final Map<String, String> cellsByHeader = new HashMap<>();
-        private final List<String> cellsByIndex = new ArrayList<>();
 
-        public void addCell(String header, String value) {
-            if (header != null)
-                this.cellsByHeader.put(header, value);
-            this.cellsByIndex.add(value);
-        }
-
-        public String get(String name) {
-            return cellsByHeader.get(name);
-        }
-
-        public String get(int i) {
-            return cellsByIndex.get(i);
-        }
-    }
 
     public Stream<Row> parse(Path path) throws IOException {
         if (hasHeader) {

@@ -27,7 +27,7 @@ class SexyCSVTest {
                 .rowFilter(s -> s.matches("^\\d.*")) //we are only interested in rows that start with a number
                 .build();
 
-        List<SexyCSV.Row> data = parser.parse(path)
+        List<Row> data = parser.parse(path)
                 .collect(Collectors.toList());
 
         assertEquals(3, data.size());
