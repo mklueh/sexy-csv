@@ -3,7 +3,6 @@ package com.mklueh.sexycsv;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.IOException;
@@ -28,8 +27,6 @@ public class SexyCSV {
     private List<String> header;
 
     private Predicate<? super String> rowFilter;
-
-
 
     public Stream<Row> parse(Path path) throws IOException {
         if (hasHeader) {
