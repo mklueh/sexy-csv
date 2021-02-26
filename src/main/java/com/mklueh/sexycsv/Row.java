@@ -1,19 +1,18 @@
 package com.mklueh.sexycsv;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Data
-@AllArgsConstructor
 public class Row {
-    private int line;
+    private final int line;
     private final Map<String, String> cellsByHeader = new HashMap<>();
     private final List<String> cellsByIndex = new ArrayList<>();
+
+    public Row(int line) {
+        this.line = line;
+    }
 
     public void addCell(String header, String value) {
         if (header != null)
@@ -27,5 +26,9 @@ public class Row {
 
     public String get(int i) {
         return cellsByIndex.get(i);
+    }
+
+    public int line() {
+        return line;
     }
 }
