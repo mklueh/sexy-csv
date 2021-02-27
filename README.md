@@ -11,14 +11,14 @@ Very tiny Java CSV parser based on Java 8 Streaming API and Lombok that is simpl
 Path path = Path.of("some-file.csv");
 
 SexyCSV.builder()
-.delimiter(",")
-.hasHeader(true)
-.build()
-.parse(path)
-.collect(Collectors.toList())
-.forEach(row -> {
-    String b = row.get("columnName");
-});
+        .delimiter(",")
+        .hasHeader(true)
+        .build()
+        .parse(path)
+        .collect(Collectors.toList())
+        .forEach(row -> {
+            String b = row.get("columnName");
+        });
 
 
 
