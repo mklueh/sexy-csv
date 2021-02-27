@@ -2,6 +2,14 @@
 
 Very tiny Java CSV parser based on Java 8 Streaming API and Lombok that is simple to configure.
 
+
+### Usecase
+
+You don´t want to rely on rather big libraries such as Apache Commons CSV, dislike their API or lacking features such
+as line skipping, filling missing cells correctly with null using tabulator delimiter this library might be all you
+need.
+
+
 ### Sample
 
 
@@ -49,12 +57,6 @@ String b = row.get("columnName")
 
 
 ```
-
-### Usage
-
-If you don´t want to rely on rather big libraries such as Apache Commons CSV, dislike their API or lacking features such
-as line skipping, filling missing cells correctly with null using tabulator delimiter this library might be all you
-need.
 
 ### Features
 
