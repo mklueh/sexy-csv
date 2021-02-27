@@ -23,7 +23,6 @@ SexyCSV.builder()
         .hasHeader(true)
         .build()
         .parse(path)
-        .collect(Collectors.toList())
         .forEach(row -> {
             String b = row.get("columnName");
         });
