@@ -4,6 +4,28 @@ Very tiny Java CSV parser based on Java 8 Streaming API and Lombok that is simpl
 
 ### Sample
 
+
+#### Simple
+
+```java
+Path path = Path.of("some-file.csv");
+
+SexyCSV.builder()
+.delimiter(",")
+.hasHeader(true)
+.build()
+.parse(path)
+.collect(Collectors.toList())
+.forEach(row -> {
+    String b = row.get("columnName");
+});
+
+
+
+```
+
+#### Extended
+
 ```java
 Path path = Path.of("some-file.csv");
 
