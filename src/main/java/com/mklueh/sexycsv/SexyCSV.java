@@ -18,10 +18,16 @@ import java.util.stream.Stream;
 @AllArgsConstructor
 public class SexyCSV {
 
+    /**
+     * Skips rows above the actual header
+     */
     private int skipRows;
 
     private String delimiter;
 
+    /**
+     * Auto header detection
+     */
     private boolean hasHeader;
 
     private List<String> header;
@@ -34,9 +40,9 @@ public class SexyCSV {
         }
 
         AtomicInteger line = new AtomicInteger();
-        Stream<String> stream = getStream(path);
 
-        return stream
+        return Files.lines(path)
+                .skip(skipRows)
                 .filter(rowFilter != null ? rowFilter : s -> true)
                 .map(s -> s.split(delimiter))
                 .map(cells -> {
@@ -51,15 +57,9 @@ public class SexyCSV {
     }
 
     private void loadHeader(Path path) throws IOException {
-        getStream(path)
+        Files.lines(path).skip(skipRows)
                 .findFirst()
                 .ifPresent(s -> header = Arrays.asList(s.split(delimiter)));
-    }
-
-    private Stream<String> getStream(Path path) throws IOException {
-        Stream<String> stream = Files.lines(path);
-        stream = stream.skip(skipRows);
-        return stream;
     }
 
 }
