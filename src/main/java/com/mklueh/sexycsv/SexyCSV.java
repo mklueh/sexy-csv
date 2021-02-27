@@ -33,8 +33,14 @@ public class SexyCSV {
 
     private List<String> header;
 
+    /**
+     * Filter corrupt rows
+     */
     private Predicate<? super String> rowFilter;
 
+    /**
+     * Handle cell splitting by yourself
+     */
     private Function<? super String, String[]> tokenizer;
 
     public Stream<Row> parse(Path path) throws IOException {
