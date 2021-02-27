@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -34,6 +35,8 @@ public class SexyCSV {
 
     private Predicate<? super String> rowFilter;
 
+    private Function<? super String, String[]> tokenizer;
+
     public Stream<Row> parse(Path path) throws IOException {
         if (hasHeader) {
             loadHeader(path);
@@ -44,7 +47,7 @@ public class SexyCSV {
         return Files.lines(path)
                 .skip(skipRows)
                 .filter(rowFilter != null ? rowFilter : s -> true)
-                .map(s -> s.split(delimiter))
+                .map(tokenizer != null ? tokenizer : s -> s.split(delimiter))
                 .map(cells -> {
                     Row row = new Row(line.getAndIncrement());
                     for (int i = 0; i < cells.length; i++) {
@@ -56,10 +59,10 @@ public class SexyCSV {
                 });
     }
 
-    private void loadHeader(Path path) throws IOException {
+    protected void loadHeader(Path path) throws IOException {
         Files.lines(path).skip(skipRows)
                 .findFirst()
-                .ifPresent(s -> header = Arrays.asList(s.split(delimiter)));
+                .ifPresent(s -> header = Arrays.asList(tokenizer != null ? tokenizer.apply(s) : s.split(delimiter)));
     }
 
 }

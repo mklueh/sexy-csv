@@ -25,7 +25,7 @@ public class Row {
     }
 
     public String get(int i) {
-        return cellsByIndex.get(i);
+        return i < this.cellsByIndex.size() ? cellsByIndex.get(i) : null;
     }
 
     public int line() {
