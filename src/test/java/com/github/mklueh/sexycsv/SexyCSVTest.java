@@ -1,12 +1,10 @@
-package com.mklueh.sexycsv;
+package com.github.mklueh.sexycsv;
 
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 

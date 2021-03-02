@@ -1,4 +1,4 @@
-package com.mklueh.sexycsv;
+package com.github.mklueh.sexycsv;
 
 
 import lombok.AllArgsConstructor;
