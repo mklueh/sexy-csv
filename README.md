@@ -68,7 +68,7 @@ String b = row.get("columnName")
 
 
 ### Source
-https://github.com/mklueh/sexy-csv
+[https://github.com/mklueh/sexy-csv](https://github.com/mklueh/sexy-csv)
 
 ### Project Page
-https://mklueh.github.io/sexy-csv/
+[https://mklueh.github.io/sexy-csv/](https://mklueh.github.io/sexy-csv/)
