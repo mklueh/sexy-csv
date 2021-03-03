@@ -51,7 +51,7 @@ public class SexyCSV {
         AtomicInteger line = new AtomicInteger();
 
         return Files.lines(path)
-                .skip(skipRows)
+                .skip(skipRows + (hasHeader ? 1 : 0))
                 .filter(rowFilter != null ? rowFilter : s -> true)
                 .map(tokenizer != null ? tokenizer : s -> s.split(delimiter))
                 .map(cells -> {
