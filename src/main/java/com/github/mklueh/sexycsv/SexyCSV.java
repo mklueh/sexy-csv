@@ -26,6 +26,8 @@ public class SexyCSV {
 
     private String delimiter;
 
+    private Charset charset;
+    
     /**
      * Auto header detection
      */
@@ -50,7 +52,7 @@ public class SexyCSV {
 
         AtomicInteger line = new AtomicInteger();
 
-        return Files.lines(path)
+        return Files.lines(path, charset())
                 .skip(skipRows + (hasHeader ? 1 : 0))
                 .filter(rowFilter != null ? rowFilter : s -> true)
                 .map(tokenizer != null ? tokenizer : s -> s.split(delimiter))
@@ -66,9 +68,14 @@ public class SexyCSV {
     }
 
     protected void loadHeader(Path path) throws IOException {
-        Files.lines(path).skip(skipRows)
+        Files.lines(path, charset())
+                .skip(skipRows)
                 .findFirst()
                 .ifPresent(s -> header = Arrays.asList(tokenizer != null ? tokenizer.apply(s) : s.split(delimiter)));
+    }
+    
+     private Charset charset() {
+        return charset != null ? charset : Charset.defaultCharset();
     }
 
 }
