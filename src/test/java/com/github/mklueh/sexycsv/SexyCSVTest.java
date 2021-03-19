@@ -12,12 +12,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SexyCSVTest {
 
-
     @Test
     void testDefault() throws IOException {
         Path path = Paths.get("src", "test", "resources", "sample-data.csv");
 
-        SexyCSV parser = SexyCSV.builder()
+        SexyCSV.Parser parser = SexyCSV.Parser
+                .builder()
                 .delimiter(",")
                 .hasHeader(true) //auto-use of the given header
                 //.header(Arrays.asList("id", "name", "age", "country")) set optional header
@@ -26,8 +26,7 @@ class SexyCSVTest {
                 //.tokenizer(s -> s.split(";")) optional custom tokenizer
                 .build();
 
-        List<Row> data = parser.parse(path)
-                .collect(Collectors.toList());
+        List<Row> data = parser.parse(path).collect(Collectors.toList());
 
         assertEquals(3, data.size());
     }
@@ -37,7 +36,7 @@ class SexyCSVTest {
     void testTab() throws IOException {
         Path path = Paths.get("src", "test", "resources", "sample-data-tab.csv");
 
-        SexyCSV parser = SexyCSV.builder()
+        SexyCSV.Parser parser = SexyCSV.Parser.builder()
                 .delimiter("\t")
                 .hasHeader(true) //auto-use of the given header
                 //.header(Arrays.asList("id", "name", "age", "country")) set optional header
