@@ -9,7 +9,7 @@ import java.util.function.Function;
  * @param <Child>
  * @param <Builder>
  */
-abstract class CsvParserBuilder<Entity, Child extends CsvParser<Entity>,
+abstract class CsvParserBuilder<Entity, Child extends CsvParser,
         Builder extends CsvParserBuilder<Entity, Child, Builder>> {
 
     public abstract Child build();

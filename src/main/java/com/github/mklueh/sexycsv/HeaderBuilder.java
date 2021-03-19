@@ -2,20 +2,20 @@ package com.github.mklueh.sexycsv;
 
 import com.github.mklueh.sexycsv.annotation.CSVColumn;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class HeaderLoader {
+/**
+ * Builds a header by analyzing a given entity
+ */
+public class HeaderBuilder {
 
 
     public static class Header {
         AtomicInteger fieldNumberCount = new AtomicInteger(0);
         Map<String, Integer> headerPositionMap = new HashMap<>();
         Map<Integer, String> headerPositionMapInverse = new HashMap<>();
-        List<String> headers;
+        List<String> headers = new ArrayList<>();
     }
 
     /**
@@ -44,7 +44,7 @@ public class HeaderLoader {
      * Extracts headers based on the {@link CSVColumn} annotations defined in the entity and orders them by position
      * or by natural field order as fallback
      */
-    public Header extractHeaders(Class<?> entity) {
+    public Header fromEntity(Class<?> entity) {
         Header header = new Header();
         Arrays.stream(entity.getDeclaredFields()).forEach(field -> {
             field.setAccessible(true);

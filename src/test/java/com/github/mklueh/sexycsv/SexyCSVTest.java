@@ -28,6 +28,30 @@ class SexyCSVTest {
 
         List<Row> data = parser.parse(path).collect(Collectors.toList());
 
+        data.forEach(row -> System.out.println(row.getCellsByIndex()));
+
+        assertEquals(3, data.size());
+    }
+
+    @Test
+    void testEntity() throws IOException {
+        Path path = Paths.get("src", "test", "resources", "sample-data.csv");
+
+        SexyCSV.Parser parser = SexyCSV.Parser
+                .builder()
+                .delimiter(",")
+                .withEntity(MyEntity.class)
+                .hasHeader(true) //auto-use of the given header
+                //.header(Arrays.asList("id", "name", "age", "country")) set optional header
+                .skipRows(3)
+                .rowFilter(s -> s.matches("^\\d.*")) //we are only interested in rows that start with a number
+                //.tokenizer(s -> s.split(";")) optional custom tokenizer
+                .build();
+
+        List<Object> data = parser.parse(path, MyEntity.class).collect(Collectors.toList());
+
+        data.forEach(row -> System.out.println(row.toString()));
+
         assertEquals(3, data.size());
     }
 

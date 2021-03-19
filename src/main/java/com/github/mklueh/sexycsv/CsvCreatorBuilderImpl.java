@@ -45,7 +45,10 @@ public class CsvCreatorBuilderImpl<Entity, Child extends CsvCreator<Entity>>
 
         creator.typeConverters = typeConverters;
         creator.delimiter = delimiter;
-        creator.extractHeaders(clazz);
+
+        HeaderBuilder headerBuilder = new HeaderBuilder();
+        HeaderBuilder.Header header = headerBuilder.fromEntity(clazz);
+        creator.setHeader(header);
 
         return creator;
     }

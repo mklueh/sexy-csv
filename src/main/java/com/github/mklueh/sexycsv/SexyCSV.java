@@ -21,12 +21,9 @@ public class SexyCSV {
     /**
      * Extract data from CSV and create entities
      */
-    public static class EntityParser<Entity> extends CsvParser<Entity> {
-    }
-
     @SuperBuilder
     @SuppressWarnings("ALL")
-    public static class Parser<Entity> extends CsvParser<Entity> {
+    public static class Parser extends CsvParser {
 
     }
 }

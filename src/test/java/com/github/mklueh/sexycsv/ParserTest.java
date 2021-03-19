@@ -14,28 +14,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 class ParserTest {
 
-    @Data
-    public static class MyEntity {
-
-        @CSVColumn(value = "test", position = 0)
-        public String test;
-
-        @CSVColumn(value = "a_number", position = 1)
-        public Integer number;
-
-        @CSVColumn
-        private String anotherString;
-    }
-
     @Test
     void testParser2() {
         List<MyEntity> entities = new ArrayList<>();
 
         for (int i = 0; i < 30; i++) {
             MyEntity entity = new MyEntity();
-            entity.setTest("s_" + i);
-            entity.setNumber(i);
-            entity.setAnotherString("bla");
+            entity.setName("s_" + i);
+            entity.setId(String.valueOf(i));
+            entity.setAge(i);
+            entity.setCountry("bla");
             entities.add(entity);
         }
 

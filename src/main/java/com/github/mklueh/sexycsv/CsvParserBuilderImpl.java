@@ -10,7 +10,7 @@ import java.util.function.Function;
  * @param <Entity>
  * @param <Child>
  */
-public class CsvParserBuilderImpl<Entity, Child extends CsvParser<Entity>>
+public class CsvParserBuilderImpl<Entity, Child extends CsvParser>
         extends CsvParserBuilder<Entity, Child, CsvParserBuilderImpl<Entity, Child>> {
 
     protected String delimiter = ",";

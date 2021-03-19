@@ -3,8 +3,8 @@ package com.github.mklueh.sexycsv;
 import com.github.mklueh.sexycsv.annotation.CSVColumn;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.PrintWriter;
@@ -20,15 +20,14 @@ import java.util.stream.Stream;
  *
  * @param <Entity>
  */
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 class CsvCreator<Entity> {
 
     String delimiter;
 
-    private final List<String> headers = new ArrayList<>();
-    private final Map<String, Integer> headerPositionMap = new HashMap<>();
-    private final Map<Integer, String> headerPositionMapInverse = new HashMap<>();
+    private HeaderBuilder.Header header;
 
     Map<Class<?>, Function<Object, String>> typeConverters = new HashMap<>();
 
@@ -95,7 +94,8 @@ class CsvCreator<Entity> {
 
     private Stream<Row> toRowStream(Stream<Entity> entities) {
         AtomicInteger line = new AtomicInteger(0);
-        Stream<? extends Row> header = Stream.of(createHeaderRow());
+        Row headerRow = createHeaderRow(header);
+        Stream<? extends Row> header = Stream.of(headerRow);
         return Stream.concat(header, entities.map(e -> {
             Row row = parseEntity(e);
             row.setLine(line.getAndIncrement());
@@ -107,13 +107,13 @@ class CsvCreator<Entity> {
      * Converts any entity to a Row by parsing csv-relevant fields based on the {@link CSVColumn} annotation
      */
     protected Row parseEntity(Entity entity) {
-        Row row = new Row(0, new String[headers.size()]);
+        Row row = new Row(0, new String[header.headers.size()]);
         Arrays.stream(entity.getClass().getDeclaredFields())
                 .forEach(field -> {
                     field.setAccessible(true);
                     if (field.getAnnotation(CSVColumn.class) != null) {
                         String identifier = extractIdentifier(field);
-                        Integer position = headerPositionMap.get(identifier);
+                        Integer position = header.headerPositionMap.get(identifier);
 
                         try {
                             Object obj = field.get(entity);
@@ -131,40 +131,6 @@ class CsvCreator<Entity> {
     }
 
     /**
-     * Extracts headers based on the {@link CSVColumn} annotations defined in the entity and orders them by position
-     * or by natural field order as fallback
-     */
-    protected void extractHeaders(Class<?> entity) {
-        AtomicInteger fieldNumberCounter = new AtomicInteger(0);
-        Arrays.stream(entity.getDeclaredFields()).forEach(field -> {
-            field.setAccessible(true);
-            CSVColumn annotation = field.getAnnotation(CSVColumn.class);
-            if (annotation != null) {
-
-                String columnName = extractIdentifier(field);
-                int nextPosition = determineColumnPosition(fieldNumberCounter, annotation);
-
-                headerPositionMap.put(columnName, nextPosition);
-                headerPositionMapInverse.put(nextPosition, columnName);
-                headers.add(columnName);
-            }
-        });
-    }
-
-    /**
-     * Should provide an ongoing column number based on defined positions, as well as the natural field
-     * order as fallback.
-     *
-     * TODO handle overlapping positions correctly or fail?
-     * TODO fallback ordering not implemented correctly
-     */
-    private int determineColumnPosition(AtomicInteger fieldNumberCounter, CSVColumn annotation) {
-        int fieldNum = fieldNumberCounter.incrementAndGet(); //TODO use natural order as fallback of overlapping
-        int position = annotation.position();
-        return position == -1 ? headers.size() : position;
-    }
-
-    /**
      * Returns the column identifier based on the annotation definition or field
      * name as fallback
      */
@@ -176,14 +142,7 @@ class CsvCreator<Entity> {
     /**
      * Creates the header row
      */
-    protected Row createHeaderRow() {
-        return new Row(0, headerPositionMapInverse.values().toArray(new String[headers.size()]));
-    }
-
-    /**
-     * Creates the header row
-     */
-    protected Row createHeaderRow(HeaderLoader.Header header) {
+    protected Row createHeaderRow(HeaderBuilder.Header header) {
         return new Row(0, header.headerPositionMapInverse.values().toArray(new String[header.headers.size()]));
     }
 
