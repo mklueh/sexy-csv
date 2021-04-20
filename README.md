@@ -1,11 +1,12 @@
 # SexyCSV
 
-Very tiny Java CSV parser based on Java 8 Streaming API.
+Java CSV parser / creator with the goal of providing the leanest API possible - based on Java 8 Streaming API
 
-Simple to configure.
+Deals with certain edge cases other parsers aren't capable of and does not require
+pre-processing for metadata trimming.
 
 
-### Usecase
+### Use-Case
 
 You don´t want to rely on rather big libraries such as Apache Commons CSV, dislike their API or lacking features such as
 line skipping, filling missing cells correctly with null using tabulator delimiter this library might be all you need.
@@ -107,6 +108,7 @@ Stream<TestEntity> entities = parser.parse(path,TestEntity.class);
     - Based on Java class entity
 - Streaming API
 - Streaming based prepending of meta information above the header
+- Column order rearranging   
 - TypeConverters to deal with custom type serialization
 
 ````java
