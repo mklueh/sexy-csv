@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 class CsvCreator<Entity> {
 
     String delimiter;
+    Stream<Row> prependingHeader;
 
     private HeaderBuilder.Header header;
 
@@ -42,14 +43,17 @@ class CsvCreator<Entity> {
         this.typeConverters.put(type, converter);
     }
 
-    public void toFile(Collection<Entity> collection, Path path) {
+    public void toFile(Stream<Entity> collection, Path path) {
         Stream<Row> rowStream = toRowStream(collection);
         toFile(path, rowStream);
     }
 
-    public void toFile(Stream<Entity> collection, Path path) {
-        Stream<Row> rowStream = toRowStream(collection);
-        toFile(path, rowStream);
+    public String toString(Stream<Entity> stream) {
+        return convertRowStreamToString(toRowStream(stream));
+    }
+
+    public Stream<String> toStream(Stream<Entity> stream) {
+        return toRowStream(stream).map(this::convertRowToString);
     }
 
     @SneakyThrows
@@ -60,20 +64,8 @@ class CsvCreator<Entity> {
         }
     }
 
-    public String toString(Collection<Entity> collection) {
-        return convertRowStreamToString(toRowStream(collection));
-    }
-
-    public Stream<Row> toRowStream(Collection<Entity> entities) {
+    private Stream<Row> toRowStream(Collection<Entity> entities) {
         return toRowStream(entities.stream());
-    }
-
-    public String toString(Stream<Entity> stream) {
-        return convertRowStreamToString(toRowStream(stream));
-    }
-
-    public Stream<String> toStream(Stream<Entity> stream) {
-        return toRowStream(stream).map(this::convertRowToString);
     }
 
     private String convertRowStreamToString(Stream<Row> rowStream) {
@@ -95,7 +87,12 @@ class CsvCreator<Entity> {
     private Stream<Row> toRowStream(Stream<Entity> entities) {
         AtomicInteger line = new AtomicInteger(0);
         Row headerRow = createHeaderRow(header);
+
         Stream<? extends Row> header = Stream.of(headerRow);
+
+        if (prependingHeader != null)
+            header = Stream.concat(prependingHeader, header);
+
         return Stream.concat(header, entities.map(e -> {
             Row row = parseEntity(e);
             row.setLine(line.getAndIncrement());

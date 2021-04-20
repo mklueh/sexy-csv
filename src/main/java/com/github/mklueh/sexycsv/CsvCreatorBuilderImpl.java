@@ -1,8 +1,10 @@
 package com.github.mklueh.sexycsv;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Builder class template implementation. Set builder methods here
@@ -14,6 +16,8 @@ public class CsvCreatorBuilderImpl<Entity, Child extends CsvCreator<Entity>>
         extends CsvCreatorBuilder<Entity, Child, CsvCreatorBuilderImpl<Entity, Child>> {
 
     protected String delimiter = ",";
+
+    protected Stream<Row> preHeader;
 
     protected Class<? extends Entity> clazz;
 
@@ -37,6 +41,16 @@ public class CsvCreatorBuilderImpl<Entity, Child extends CsvCreator<Entity>>
         return this;
     }
 
+
+    /**
+     * If you like to prepend rows above the actual header
+     */
+    @Override
+    public CsvCreatorBuilderImpl<Entity, Child> prependHeader(Stream<Row> preHeader) {
+        this.preHeader = preHeader;
+        return this;
+    }
+
     @Override
     public Child build() {
 
@@ -46,9 +60,11 @@ public class CsvCreatorBuilderImpl<Entity, Child extends CsvCreator<Entity>>
         creator.typeConverters = typeConverters;
         creator.delimiter = delimiter;
 
-        HeaderBuilder headerBuilder = new HeaderBuilder();
+        HeaderBuilder headerBuilder = new HeaderBuilder(Charset.defaultCharset());
         HeaderBuilder.Header header = headerBuilder.fromEntity(clazz);
+
         creator.setHeader(header);
+        creator.setPrependingHeader(preHeader);
 
         return creator;
     }

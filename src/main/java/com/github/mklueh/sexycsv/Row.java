@@ -1,5 +1,7 @@
 package com.github.mklueh.sexycsv;
+
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.SneakyThrows;
 
@@ -8,36 +10,44 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Row container
+ */
 @Getter
 @Setter
 public class Row {
 
+    /**
+     * Line number
+     */
     private int line;
 
+    //TODO unify if possible
     private String[] cells;
-    private boolean allowDuplicatedHeaders;
-
-    private final Map<String, String> cellsByHeader = new HashMap<>();
     private final List<String> cellsByIndex = new ArrayList<>();
 
-    public Row(int line, boolean allowDuplicatedHeaders) {
-        this.line = line;
-        this.allowDuplicatedHeaders = allowDuplicatedHeaders;
-    }
+    //By storing the values with their corresponding column names, we make access efficient
+    private final Map<String, String> cellsByHeader = new HashMap<>();
 
     public Row(int line, String[] cells) {
         this.line = line;
         this.cells = cells;
     }
 
+    public Row(int line) {
+        this.line = line;
+    }
+
     @SneakyThrows
     public void addCell(String header, String value) {
+        this.cellsByIndex.add(value);
         if (header != null) {
-            if (!allowDuplicatedHeaders && this.cellsByHeader.containsKey(header))
-                throw new Exception("Header " + header + " exists multiple times");
+            if (this.cellsByHeader.containsKey(header)) {
+                int pos = this.cellsByIndex.size() - 1;
+                header = header + "#" + pos;
+            }
             this.cellsByHeader.put(header, value);
         }
-        this.cellsByIndex.add(value);
     }
 
     public String get(String name) {

@@ -10,67 +10,79 @@ import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SexyCSVTest {
+class CsvParserTest {
 
     @Test
-    void testDefault() throws IOException {
-        Path path = Paths.get("src", "test", "resources", "sample-data.csv");
+    void testParsingWithEntityHeaders() throws IOException {
+        Path path = getCsv("sample-data-comma.csv");
 
         SexyCSV.Parser parser = SexyCSV.Parser
                 .builder()
                 .delimiter(",")
-                .hasHeader(true) //auto-use of the given header
-                //.header(Arrays.asList("id", "name", "age", "country")) set optional header
-                .skipRows(3)
+                .build();
+
+        List<TestEntity> data = parser.parse(path, TestEntity.class).collect(Collectors.toList());
+
+        data.forEach(row -> System.out.println(row.toString()));
+
+        assertEquals(5, data.size());
+    }
+
+    @Test
+//.header(Arrays.asList("id", "name", "age", "country")) set optional header
+    void testParsingWithCustomTokenizer() throws IOException {
+        Path path = getCsv("sample-data-comma.csv");
+
+        SexyCSV.Parser parser = SexyCSV.Parser
+                .builder()
+                .hasHeaderRow(true) //auto-use of the given header
                 .rowFilter(s -> s.matches("^\\d.*")) //we are only interested in rows that start with a number
-                //.tokenizer(s -> s.split(";")) optional custom tokenizer
+                .tokenizer(s -> s.split(",")) //optional custom tokenizer
                 .build();
 
         List<Row> data = parser.parse(path).collect(Collectors.toList());
 
         data.forEach(row -> System.out.println(row.getCellsByIndex()));
 
-        assertEquals(3, data.size());
+        for (int i = 0; i < data.size(); i++) {
+            Row row = data.get(i);
+            assertEquals(String.valueOf(i + 1), row.get("id"));
+        }
+
+        assertEquals(4, data.size());
     }
 
     @Test
-    void testEntity() throws IOException {
-        Path path = Paths.get("src", "test", "resources", "sample-data.csv");
+    void testParsingCorruptedWithCustomTokenizerAndPreHeader() throws IOException {
+        Path path = getCsv("sample-data-pre-header-comma-corrupted.csv");
 
         SexyCSV.Parser parser = SexyCSV.Parser
                 .builder()
                 .delimiter(",")
-                .withEntity(MyEntity.class)
-                .hasHeader(true) //auto-use of the given header
-                //.header(Arrays.asList("id", "name", "age", "country")) set optional header
                 .skipRows(3)
                 .rowFilter(s -> s.matches("^\\d.*")) //we are only interested in rows that start with a number
-                //.tokenizer(s -> s.split(";")) optional custom tokenizer
                 .build();
 
-        List<Object> data = parser.parse(path, MyEntity.class).collect(Collectors.toList());
+        List<TestEntity> data = parser.parse(path, TestEntity.class).collect(Collectors.toList());
 
         data.forEach(row -> System.out.println(row.toString()));
 
         assertEquals(3, data.size());
     }
 
-
     @Test
-    void testTab() throws IOException {
-        Path path = Paths.get("src", "test", "resources", "sample-data-tab.csv");
+    void testParsingCorruptedWithTabAndPreHeader() throws IOException {
+        Path path = getCsv("sample-data-pre-header-tab-corrupted.csv");
 
         SexyCSV.Parser parser = SexyCSV.Parser.builder()
                 .delimiter("\t")
-                .hasHeader(true) //auto-use of the given header
-                //.header(Arrays.asList("id", "name", "age", "country")) set optional header
+                .hasHeaderRow(true) //auto-use of the given header
                 .skipRows(3)
                 .rowFilter(s -> s.matches("^\\d.*")) //we are only interested in rows that start with a number
                 .build();
 
         List<Row> data = parser.parse(path)
                 .collect(Collectors.toList());
-
 
         assertEquals(3, data.size());
 
@@ -83,6 +95,10 @@ class SexyCSVTest {
             else assertNull(row.get(3));
         }
 
-
     }
+
+    private Path getCsv(String file) {
+        return Paths.get("src", "test", "resources", file);
+    }
+
 }

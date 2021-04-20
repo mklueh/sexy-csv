@@ -6,17 +6,15 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -34,19 +32,15 @@ public class CsvParser {
 
     private String delimiter;
 
-    /**
-     * Disable exception thrown by duplicated header names
-     */
-    private boolean allowDuplicatedHeaders;
-
     private Charset charset;
 
     /**
-     * Auto header detection
+     * Auto header detection based on the first row of
+     * the CSV file
      */
-    private boolean hasHeader;
+    private boolean hasHeaderRow;
 
-    private HeaderBuilder.Header header = new HeaderBuilder.Header();
+    private HeaderBuilder.Header header;
 
     /**
      * Filter corrupt rows
@@ -58,24 +52,13 @@ public class CsvParser {
      */
     private Function<? super String, String[]> tokenizer;
 
-    /**
-     * Entity clazz
-     */
-    private Class<?> withEntity;
-
-
-    public static <T, G> List<G> fromArrayToList(T[] a, Function<T, G> mapperFunction) {
-        return Arrays.stream(a)
-                .map(mapperFunction)
-                .collect(Collectors.toList());
-    }
-
-    public <T, G> Stream<G> parse(Path path, Class<? extends T> clazz) throws IOException {
-        Stream<Row> rows = parse(path);
+    public <T> Stream<T> parse(Path path, Class<T> clazz) throws IOException {
+        Stream<Row> rows = parseFile(path, clazz);
         return rows.map(row -> {
             try {
-                G o = (G) clazz.getDeclaredConstructor().newInstance();
-                Arrays.stream(clazz.getDeclaredFields()).forEach(field -> {
+                T o = (T) clazz.getDeclaredConstructor().newInstance();
+                Field[] fields = clazz.getDeclaredFields();
+                for (Field field : fields) {
                     field.setAccessible(true);
                     String fieldName = field.getName();
                     Type type = field.getGenericType();
@@ -83,40 +66,36 @@ public class CsvParser {
                     if (annotation != null) {
                         String columnName = annotation.value();
                         String value = row.get(columnName);
-                        try {
-                            if (type.getTypeName().equals(String.class.getName())) {
-                                field.set(o, value);
-                            }
-                        } catch (IllegalAccessException e) {
-                            e.printStackTrace();
+                        if (type.getTypeName().equals(String.class.getName())) {
+                            field.set(o, value);
                         }
                     }
-
-                });
+                }
                 return o;
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException(e);
             }
-            return null;
         });
 
     }
 
+
     public Stream<Row> parse(Path path) throws IOException {
-        if (hasHeader) {
-            if (withEntity != null) {
-                header = new HeaderBuilder().fromEntity(withEntity);
-            } else loadHeader(path);
-        }
+        return parseFile(path, null);
+    }
+
+    private <T> Stream<Row> parseFile(Path path, Class<T> entityClass) throws IOException {
+
+        header = loadHeader(path, entityClass);
 
         AtomicInteger line = new AtomicInteger();
 
         return Files.lines(path, charset())
-                .skip(skipRows + (hasHeader ? 1 : 0))
+                .skip(skipRows + (hasHeaderRow ? 1 : 0))
                 .filter(rowFilter != null ? rowFilter : s -> true)
                 .map(tokenizer != null ? tokenizer : s -> s.split(delimiter))
                 .map(cells -> {
-                    Row row = new Row(line.getAndIncrement(), allowDuplicatedHeaders);
+                    Row row = new Row(line.getAndIncrement());
                     for (int i = 0; i < cells.length; i++) {
                         String h = null;
                         if (header != null) h = header.headers.get(i);
@@ -126,11 +105,20 @@ public class CsvParser {
                 });
     }
 
-    protected void loadHeader(Path path) throws IOException {
-        Files.lines(path, charset())
-                .skip(skipRows)
-                .findFirst()
-                .ifPresent(s -> header.headers = Arrays.asList(tokenizer != null ? tokenizer.apply(s) : s.split(delimiter)));
+    protected <T> HeaderBuilder.Header loadHeader(Path path, Class<T> entityClass) throws IOException {
+        HeaderBuilder headerBuilder = new HeaderBuilder(charset());
+        if (header != null) {
+            return header;
+        }
+
+        if (entityClass != null) {
+            return headerBuilder.fromEntity(entityClass);
+        }
+
+        if (hasHeaderRow)
+            return headerBuilder.fromFile(path, skipRows, delimiter, tokenizer);
+
+        return new HeaderBuilder.Header();
     }
 
     private Charset charset() {

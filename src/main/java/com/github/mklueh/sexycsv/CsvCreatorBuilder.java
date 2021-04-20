@@ -1,6 +1,7 @@
 package com.github.mklueh.sexycsv;
 
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Generic Builder class template
@@ -19,4 +20,6 @@ abstract class CsvCreatorBuilder<Entity, Child extends CsvCreator<Entity>,
     public abstract Builder withEntity(Class<? extends Entity> clazz);
 
     public abstract Builder delimiter(String delimiter);
+
+    public abstract CsvCreatorBuilderImpl<Entity, Child> prependHeader(Stream<Row> preHeader);
 }

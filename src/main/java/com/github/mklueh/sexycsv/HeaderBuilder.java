@@ -2,14 +2,25 @@ package com.github.mklueh.sexycsv;
 
 import com.github.mklueh.sexycsv.annotation.CSVColumn;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 /**
  * Builds a header by analyzing a given entity
  */
 public class HeaderBuilder {
 
+    private final Charset charset;
+
+    public HeaderBuilder(Charset charset) {
+        this.charset = charset;
+    }
 
     public static class Header {
         AtomicInteger fieldNumberCount = new AtomicInteger(0);
@@ -22,7 +33,7 @@ public class HeaderBuilder {
      * Returns the column identifier based on the annotation definition or field
      * name as fallback
      */
-    private String extractIdentifier(java.lang.reflect.Field field) {
+    private String extractIdentifier(Field field) {
         CSVColumn annotation = field.getAnnotation(CSVColumn.class);
         return CSVColumn.NULL.equals(annotation.value()) ? field.getName() : annotation.value();
     }
@@ -38,6 +49,20 @@ public class HeaderBuilder {
         int fieldNum = header.fieldNumberCount.incrementAndGet(); //TODO use natural order as fallback of overlapping
         int position = annotation.position();
         return position == -1 ? header.headers.size() : position;
+    }
+
+    /**
+     * Builds the header from the first row of the given file
+     */
+    public Header fromFile(Path path, int skipRows, String delimiter, Function<? super String, String[]> tokenizer) throws IOException {
+        Header header = new Header();
+        return Files.lines(path, charset)
+                .skip(skipRows)
+                .findFirst()
+                .map(s -> {
+                    header.headers = Arrays.asList(tokenizer != null ? tokenizer.apply(s) : s.split(delimiter));
+                    return header;
+                }).orElse(header);
     }
 
     /**

@@ -3,8 +3,12 @@ package com.github.mklueh.sexycsv;
 import com.github.mklueh.sexycsv.annotation.CSVColumn;
 import lombok.Data;
 
+/**
+ * Sample entity used in tests.
+ * Column headers are generated from annotations
+ */
 @Data
-public class MyEntity {
+public class TestEntity {
 
     @CSVColumn(value = "id", position = 0)
     public String id;
