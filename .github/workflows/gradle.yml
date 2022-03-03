@@ -29,6 +29,6 @@ jobs:
         run: chmod +x gradlew
 
       - name: Publish package
-        run: gradle -Pversion=1.0.1 build publish
+        run: gradle build publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
