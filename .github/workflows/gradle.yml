@@ -37,8 +37,8 @@ jobs:
               -Prelease.customUsername=${{ github.actor }} \
               -Prelease.customPassword=${{ github.token }}
 
-
       - name: Publish package
-        run: ./gradlew build publish
+        run: ./gradlew build publish --stacktrace
         env:
           GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_ACTOR: ${{ github.actor }}
