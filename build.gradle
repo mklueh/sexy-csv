@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'com.github.mklueh'
-version = scmVersion.version
+project.version = scmVersion.version
 
 repositories {
     mavenCentral()
