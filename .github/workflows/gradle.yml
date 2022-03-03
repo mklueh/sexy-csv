@@ -29,9 +29,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Create new release version
-        run: ./gradlew release \
-          -Prelease.customUsername=${{ github.actor }} \
-          -Prelease.customPassword=${{ github.token }}
+        run: |
+          ./gradlew release \
+              -Prelease.customUsername=${{ github.actor }} \
+              -Prelease.customPassword=${{ github.token }}
 
 
       - name: Publish package
