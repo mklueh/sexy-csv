@@ -13,7 +13,7 @@ jobs:
   gradle:
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
@@ -28,10 +28,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Execute Gradle build
-        run: ./gradlew build
-
-      - name: Execute Gradle publish
-        run: ./gradlew publish
+      - name: Publish package
+        run: gradle -Pversion=${{ github.event.release.tag_name }} build publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
