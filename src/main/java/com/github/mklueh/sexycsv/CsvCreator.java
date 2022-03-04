@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -81,7 +82,9 @@ class CsvCreator<Entity> {
     }
 
     protected String convertRowToString(Row row) {
-        return String.join(delimiter, Arrays.asList(row.getCells()));
+        return Arrays.stream(row.getCells())
+                     .map(s -> s == null ? "" : s)
+                     .collect(Collectors.joining(delimiter));
     }
 
     private Stream<Row> toRowStream(Stream<Entity> entities) {
@@ -106,24 +109,24 @@ class CsvCreator<Entity> {
     protected Row parseEntity(Entity entity) {
         Row row = new Row(0, new String[header.headers.size()]);
         Arrays.stream(entity.getClass().getDeclaredFields())
-                .forEach(field -> {
-                    field.setAccessible(true);
-                    if (field.getAnnotation(CSVColumn.class) != null) {
-                        String identifier = extractIdentifier(field);
-                        Integer position = header.headerPositionMap.get(identifier);
+              .forEach(field -> {
+                  field.setAccessible(true);
+                  if (field.getAnnotation(CSVColumn.class) != null) {
+                      String identifier = extractIdentifier(field);
+                      Integer position = header.headerPositionMap.get(identifier);
 
-                        try {
-                            Object obj = field.get(entity);
-                            Class<?> type = field.getType();
-                            if (typeConverters.containsKey(type)) {
-                                Function<Object, String> fun = typeConverters.get(type);
-                                row.getCells()[position] = obj == null ? null : String.valueOf(fun.apply(obj));
-                            } else row.getCells()[position] = obj == null ? null : String.valueOf(obj);
-                        } catch (IllegalAccessException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                });
+                      try {
+                          Object obj = field.get(entity);
+                          Class<?> type = field.getType();
+                          if (typeConverters.containsKey(type)) {
+                              Function<Object, String> fun = typeConverters.get(type);
+                              row.getCells()[position] = obj == null ? null : String.valueOf(fun.apply(obj));
+                          } else row.getCells()[position] = obj == null ? null : String.valueOf(obj);
+                      } catch (IllegalAccessException e) {
+                          throw new RuntimeException(e);
+                      }
+                  }
+              });
         return row;
     }
 

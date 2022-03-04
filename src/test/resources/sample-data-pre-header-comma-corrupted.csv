@@ -1,7 +1,7 @@
 This CSV file is for demo purposes and contains
 meta information above the actual header, as well as corrupted data
 
-id,name,age,country
+id,name,age,country,a_null_field
 1,Peter,32,DE
 S, Adam, 22, DE
 2,Lisa,23,EN

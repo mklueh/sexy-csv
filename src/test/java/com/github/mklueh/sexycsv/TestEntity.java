@@ -21,4 +21,7 @@ public class TestEntity {
 
     @CSVColumn(value = "country")
     private String country;
+
+    @CSVColumn(value = "a_null_field")
+    private String aNullField;
 }

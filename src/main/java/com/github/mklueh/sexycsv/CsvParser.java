@@ -91,18 +91,18 @@ public class CsvParser {
         AtomicInteger line = new AtomicInteger();
 
         return Files.lines(path, charset())
-                .skip(skipRows + (hasHeaderRow ? 1 : 0))
-                .filter(rowFilter != null ? rowFilter : s -> true)
-                .map(tokenizer != null ? tokenizer : s -> s.split(delimiter))
-                .map(cells -> {
-                    Row row = new Row(line.getAndIncrement());
-                    for (int i = 0; i < cells.length; i++) {
-                        String h = null;
-                        if (header != null) h = header.headers.get(i);
-                        row.addCell(h, cells[i]);
-                    }
-                    return row;
-                });
+                    .skip(skipRows + (hasHeaderRow ? 1 : 0))
+                    .filter(rowFilter != null ? rowFilter : s -> true)
+                    .map(tokenizer != null ? tokenizer : s -> s.split(delimiter))
+                    .map(cells -> {
+                        Row row = new Row(line.getAndIncrement());
+                        for (int i = 0; i < cells.length; i++) {
+                            String h = null;
+                            if (header != null) h = header.headers.get(i);
+                            row.addCell(h, cells[i]);
+                        }
+                        return row;
+                    });
     }
 
     protected <T> HeaderBuilder.Header loadHeader(Path path, Class<T> entityClass) throws IOException {
