@@ -73,15 +73,15 @@ class CsvCreator<Entity> {
     }
 
     private StringBuilder convertToCSV(Stream<Row> rowStream) {
-        return rowStream.reduce(new StringBuilder(), (s, recPosition) -> {
-            s.append(convertRowToString(recPosition));
+        return rowStream.reduce(new StringBuilder(), (s, row) -> {
+            s.append(convertRowToString(row));
             s.append("\n");
             return s;
         }, (s, s2) -> s);
     }
 
-    protected String convertRowToString(Row recPosition) {
-        return String.join(delimiter, Arrays.asList(recPosition.getCells()));
+    protected String convertRowToString(Row row) {
+        return String.join(delimiter, Arrays.asList(row.getCells()));
     }
 
     private Stream<Row> toRowStream(Stream<Entity> entities) {
