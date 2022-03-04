@@ -4,6 +4,26 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.13.6'
 }
 
+scmVersion {
+    versionCreator 'versionWithBranch'
+    useHighestVersion = true
+    repository {
+        pushTagsOnly = true
+    }
+    tag {
+        versionSeparator = '-'
+    }
+    nextVersion {
+        suffix = 'alpha' // tag suffix
+        separator = '-'
+    }
+
+    checks {
+        uncommittedChanges = false
+        aheadOfRemote = true
+    }
+}
+
 group 'com.github.mklueh'
 project.version = scmVersion.version
 
