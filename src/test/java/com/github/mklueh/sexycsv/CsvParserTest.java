@@ -21,7 +21,7 @@ class CsvParserTest {
                 .delimiter(",")
                 .build();
 
-        List<TestEntity> data = parser.parse(path, TestEntity.class).collect(Collectors.toList());
+        List<TestEntity> data = parser.parse(path, TestEntity.class).toList();
 
         data.forEach(row -> System.out.println(row.toString()));
 
@@ -40,7 +40,7 @@ class CsvParserTest {
                 .tokenizer(s -> s.split(",")) //optional custom tokenizer
                 .build();
 
-        List<Row> data = parser.parse(path).collect(Collectors.toList());
+        List<Row> data = parser.parse(path).toList();
 
         data.forEach(row -> System.out.println(row.getCellsByIndex()));
 
@@ -63,7 +63,7 @@ class CsvParserTest {
                 .rowFilter(s -> s.matches("^\\d.*")) //we are only interested in rows that start with a number
                 .build();
 
-        List<TestEntity> data = parser.parse(path, TestEntity.class).collect(Collectors.toList());
+        List<TestEntity> data = parser.parse(path, TestEntity.class).toList();
 
         data.forEach(row -> System.out.println(row.toString()));
 
@@ -81,8 +81,7 @@ class CsvParserTest {
                 .rowFilter(s -> s.matches("^\\d.*")) //we are only interested in rows that start with a number
                 .build();
 
-        List<Row> data = parser.parse(path)
-                .collect(Collectors.toList());
+        List<Row> data = parser.parse(path).toList();
 
         assertEquals(3, data.size());
 
