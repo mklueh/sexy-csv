@@ -10,9 +10,6 @@ scmVersion {
     repository {
         pushTagsOnly = true
     }
-    tag {
-        versionSeparator = '-'
-    }
     nextVersion {
         suffix = 'alpha' // tag suffix
         separator = '-'
