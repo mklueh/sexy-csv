@@ -21,4 +21,9 @@ public class TestEntity {
 
     @CSVColumn(value = "country")
     private String country;
+
+
+    public boolean allNull() {
+        return id == null && name == null && age == null && country == null;
+    }
 }

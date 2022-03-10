@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class CsvParserTest {
 
     @Test
-    void testParsingWithEntityHeaders() throws IOException {
+    void testParsingWithEntityHeaders() throws Exception {
         Path path = getCsv("sample-data-comma.csv");
 
         SexyCSV.Parser parser = SexyCSV.Parser
@@ -30,7 +30,7 @@ class CsvParserTest {
 
     @Test
 //.header(Arrays.asList("id", "name", "age", "country")) set optional header
-    void testParsingWithCustomTokenizer() throws IOException {
+    void testParsingWithCustomTokenizer() throws Exception {
         Path path = getCsv("sample-data-comma.csv");
 
         SexyCSV.Parser parser = SexyCSV.Parser
@@ -53,7 +53,7 @@ class CsvParserTest {
     }
 
     @Test
-    void testParsingCorruptedWithCustomTokenizerAndPreHeader() throws IOException {
+    void testParsingCorruptedWithCustomTokenizerAndPreHeader() throws Exception {
         Path path = getCsv("sample-data-pre-header-comma-corrupted.csv");
 
         SexyCSV.Parser parser = SexyCSV.Parser
@@ -71,15 +71,15 @@ class CsvParserTest {
     }
 
     @Test
-    void testParsingCorruptedWithTabAndPreHeader() throws IOException {
+    void testParsingCorruptedWithTabAndPreHeader() throws Exception {
         Path path = getCsv("sample-data-pre-header-tab-corrupted.csv");
 
         SexyCSV.Parser parser = SexyCSV.Parser.builder()
-                .delimiter("\t")
-                .hasHeaderRow(true) //auto-use of the given header
-                .skipRows(3)
-                .rowFilter(s -> s.matches("^\\d.*")) //we are only interested in rows that start with a number
-                .build();
+                                              .delimiter("\t")
+                                              .hasHeaderRow(true) //auto-use of the given header
+                                              .skipRows(3)
+                                              .rowFilter(s -> s.matches("^\\d.*")) //we are only interested in rows that start with a number
+                                              .build();
 
         List<Row> data = parser.parse(path).toList();
 
@@ -94,6 +94,44 @@ class CsvParserTest {
             else assertNull(row.get(3));
         }
 
+    }
+
+    @Test
+    void testParsingUnrelatedFile() throws Exception {
+        Path path = getCsv("sample-data-comma-unrelated-columns.csv");
+
+        SexyCSV.Parser parser = SexyCSV.Parser
+                .builder()
+                .hasHeaderRow(true)
+                .delimiter(",")
+                .build();
+
+        List<TestEntity> data = parser.parse(path, TestEntity.class).toList();
+
+        data.forEach(row -> System.out.println(row.toString()));
+
+        assertEquals(4, data.size());
+        data.forEach(testEntity -> assertTrue(testEntity.allNull()));
+    }
+
+
+    @Test
+    void testParsingOneRelatedFile() throws Exception {
+        Path path = getCsv("sample-data-comma-one-related-column.csv");
+
+        SexyCSV.Parser parser = SexyCSV.Parser
+                .builder()
+                .hasHeaderRow(true)
+                .delimiter(",")
+                .build();
+
+        List<TestEntity> data = parser.parse(path, TestEntity.class).toList();
+
+        data.forEach(row -> System.out.println(row.toString()));
+
+        assertEquals(4, data.size());
+        data.forEach(testEntity -> assertFalse(testEntity.allNull()));
+        data.forEach(testEntity -> assertNotNull(testEntity.getId()));
     }
 
     private Path getCsv(String file) {

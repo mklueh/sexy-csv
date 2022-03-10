@@ -27,6 +27,10 @@ public class HeaderBuilder {
         Map<String, Integer> headerPositionMap = new HashMap<>();
         Map<Integer, String> headerPositionMapInverse = new HashMap<>();
         List<String> headers = new ArrayList<>();
+
+        public boolean coveredBy(Header otherHeader) {
+            return false;
+        }
     }
 
     /**
