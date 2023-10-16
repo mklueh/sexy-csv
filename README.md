@@ -1,3 +1,6 @@
+[DEPRECATED] *This project was moved to the company's internal repository where I work and is not actively maintained anymore here.*
+
+
 # SexyCSV
 
 Java CSV parser / creator with the goal of providing the leanest API possible - based on Java 8 Streaming API
@@ -57,43 +60,40 @@ public class TestEntity {
 ###### Simple
 
 ```java
-Path path=Path.of("some-file.csv");
+Path path = Path.of("some-file.csv");
 
   SexyCSV.Parser.builder()
-  .delimiter(",")
-  .hasHeaderRow(true)
-  .build()
-  .parse(path)
-  .forEach(row->{
-  String b=row.get("columnName");
-  });
-
-
-
+         .delimiter(",")
+         .hasHeaderRow(true)
+         .build()
+         .parse(path)
+         .forEach(row->{
+             String value = row.get("columnName");
+         });
 ```
 
 ###### Extended
 
 ```java
-Path path=Path.of("some-file.csv");
+Path path = Path.of("some-file.csv");
 
-SexyCSV.Parser parser=SexyCSV.Parser.builder()
-.delimiter(",")
-.hasHeaderRow(true) //auto-use of the given header in the file
-//.header(Arrays.asList("id", "name", "age", "country")) set manual header
-.skipRows(3)
-.rowFilter(s->s.matches("^\\d.*")) //we are only interested in rows that start with a number
-//.tokenizer(s -> s.split(";")) optional custom tokenizer
-.build();
+SexyCSV.Parser parser = SexyCSV.Parser.builder()
+                               .delimiter(",")
+                               .hasHeaderRow(true) //auto-use of the given header in the file
+                               //.header(Arrays.asList("id", "name", "age", "country")) set manual header
+                               .skipRows(3)
+                               .rowFilter(s->s.matches("^\\d.*")) //we are only interested in rows that start with a number
+                               //.tokenizer(s -> s.split(";")) optional custom tokenizer
+                               .build();
 
-List<Row> data=parser.parse(path)
-.collect(Collectors.toList());
+List<Row> data = parser.parse(path)
+                       .collect(Collectors.toList());
 
-Row firstRow=data.get(0);
+Row firstRow = data.get(0);
 
 // Access cells
-String a=row.get(1);
-String b=row.get("columnName")
+String a = row.get(1);
+String b = row.get("columnName")
 
 //or simply parsing to your Java entity
 
